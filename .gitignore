@@ -1,1 +1,24 @@
 appsettings.json
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+/bin/
+/obj/
+
+# .NET Core
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*/bin/*
+*/obj/*
+
+# Other
+*.DS_Store
+Thumbs.db
