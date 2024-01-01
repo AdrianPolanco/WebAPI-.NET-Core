@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.Interfaces;
+using WebApi.Repository;
 
 //You create a new ASP.NET Core Web API project with the command: dotnet new webapi -o PROJECT_NAME
 //Command in order to run and see the Swagger UI with the endpoints: dotnet watch run
@@ -20,6 +22,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
     options.UseSqlServer(connectionString);
 });
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 var app = builder.Build();
 
