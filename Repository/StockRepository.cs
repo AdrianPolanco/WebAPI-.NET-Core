@@ -22,13 +22,13 @@ namespace WebApi.Repository
 
         public async Task<List<Stock>> GetAllAsync()
         {
-            var stockList = await _context.Stock.ToListAsync();
+            var stockList = await _context.Stock.Include(c => c.Comments).ToListAsync();
             return stockList;
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            var stock = await _context.Stock.FindAsync(id);
+            var stock = await _context.Stock.Include(c => c.Comments).FirstOrDefaultAsync(s => s.Id == id);
 
             if (stock == null) return null;
 
