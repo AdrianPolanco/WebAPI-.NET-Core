@@ -14,5 +14,6 @@ namespace WebApi.Interfaces
         Task<Stock> CreateAsync(Stock stockModel);
         Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto updateStockRequest);
         Task<Stock?> DeleteAsync(int id);
+        Task<bool> Exists(int id);
     }
 }

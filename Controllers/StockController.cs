@@ -27,14 +27,16 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stockList = await _stockRepository.GetAllAsync();
             var stocks = stockList.Select(s => s.ToStockDto());
             return Ok(stocks);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             var stock = await _stockRepository.GetByIdAsync(id);
 
             if (stock == null) return NotFound();
@@ -45,15 +47,17 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockRequestDto createStockRequest)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             Stock stock = createStockRequest.ToStockFromCreateDTO();
             await _stockRepository.CreateAsync(stock);
             return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stock.ToStockDto());
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateStockRequest)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             Stock? stockModel = await _stockRepository.UpdateAsync(id, updateStockRequest);
 
             if (stockModel == null) return NotFound();
@@ -62,9 +66,10 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             Stock? stock = await _stockRepository.DeleteAsync(id);
 
             if (stock == null) return NotFound();

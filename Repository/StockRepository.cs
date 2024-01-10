@@ -28,6 +28,7 @@ namespace WebApi.Repository
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
+            //Especificando que queremos obtener el Stock de la tabla STOCK INCLUYENDO sus comentarios relacionados guardados en la tabla Comments en una sola llamada a la BD, ya que EF Core por defecto obtendra null cuando trates de acceder a las propiedades que tienen entidades relacionadas
             var stock = await _context.Stock.Include(c => c.Comments).FirstOrDefaultAsync(s => s.Id == id);
 
             if (stock == null) return null;
@@ -72,5 +73,9 @@ namespace WebApi.Repository
             return stock;
         }
 
+        public Task<bool> Exists(int id)
+        {
+            return _context.Stock.AnyAsync(s => s.Id == id);
+        }
     }
 }
