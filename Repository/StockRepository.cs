@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 using WebApi.DTOS.Stock;
+using WebApi.Helpers;
 using WebApi.Interfaces;
 using WebApi.Mappers;
 using WebApi.Models;
@@ -20,10 +21,26 @@ namespace WebApi.Repository
             _context = context;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            var stockList = await _context.Stock.Include(c => c.Comments).ToListAsync();
-            return stockList;
+
+            //Al usar .AsQueryable "diferimos" la ejecucion de la consulta, retornando este metodo un IQueryable<Tabla>, de modo que, hasta que, entre el uso de .AsQueryable() y .ToListAsync() podemos entonces, construir como sera nuestra consulta, en este caso, la estamos "configurando" para que en caso de que el usuario use los query parameters de la ruta para filtrar, entonces se ejecuten los filtrados
+            var stockList = _context.Stock.Include(c => c.Comments).AsQueryable();
+
+            //Si el query parameter (capturado en las propiedad CompanyName de la clase QueryObject) no es nulo o espacio en blanco entonces se ejecutara el codigo dentro del if
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                //Filtrara los registros cuya columna CompanyName contenga la palabra que este en el CompanyName del query
+                stockList = stockList.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stockList = stockList.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+            //.ToList() y .ToListAsync() son los que disparan a EF Core a generar las consultas para obtener datos de la tabla, osea, hasta que no invocas uno de esos metodos, la consulta aun no se ha ejecutado
+            return await stockList.ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
