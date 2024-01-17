@@ -39,6 +39,14 @@ namespace WebApi.Repository
                 stockList = stockList.Where(s => s.Symbol.Contains(query.Symbol));
             }
 
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stockList = query.IsDescending ? stockList.OrderByDescending(s => s.Symbol) : stockList.OrderBy(s => s.Symbol);
+                }
+            }
+
             //.ToList() y .ToListAsync() son los que disparan a EF Core a generar las consultas para obtener datos de la tabla, osea, hasta que no invocas uno de esos metodos, la consulta aun no se ha ejecutado
             return await stockList.ToListAsync();
         }
