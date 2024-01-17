@@ -56,7 +56,21 @@ namespace WebApi.Controllers
             Comment _comment = comment.ToCommentFromCreate(id);
             await _commentRepo.CreateAsync(_comment);
 
-            return CreatedAtAction(nameof(GetById), new { id = _comment }, _comment.ToCommentDto());
+            return CreatedAtAction(nameof(GetById), new { id = _comment.Id }, _comment.ToCommentDto());
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto requestDto)
+        {
+            Comment comment = requestDto.ToCommentFromUpdate();
+            Comment? updatedComment = await _commentRepo.UpdateAsync(id, comment);
+
+            if (updatedComment == null) return NotFound("Comment not found");
+
+            CommentDto commentDto = comment.ToCommentDto();
+
+            return Ok(commentDto);
         }
 
         //Making validation of types with id:int we are checking that the id parameter sent by the link is a number
