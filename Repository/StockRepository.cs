@@ -47,8 +47,9 @@ namespace WebApi.Repository
                 }
             }
 
+            int skipNumber = (query.PageNumber - 1) * query.PageSize;
             //.ToList() y .ToListAsync() son los que disparan a EF Core a generar las consultas para obtener datos de la tabla, osea, hasta que no invocas uno de esos metodos, la consulta aun no se ha ejecutado
-            return await stockList.ToListAsync();
+            return await stockList.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
