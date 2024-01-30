@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Data;
 using WebApi.DTOS.Stock;
@@ -21,6 +22,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
