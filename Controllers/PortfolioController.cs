@@ -35,5 +35,38 @@ namespace WebApi.Controllers
             List<Stock>? userPortfolio = await _portfolioRepository.GetUserPortfolio(appUser);
             return Ok(userPortfolio);
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddPortfolio(string symbol)
+        {
+            //Getting username
+            string? username = User.GetUsername();
+            //Getting user based on his username
+            AppUser? appUser = await _userManager.FindByNameAsync(username);
+            //Getting stock by its symbol
+            Stock? stock = await _stockRepository.GetBySymbolAsync(symbol);
+
+            //Checking if the portfolio exists
+            if (stock == null) return BadRequest("Stock not found");
+
+            List<Stock?> userPortfolio = await _portfolioRepository.GetUserPortfolio(appUser);
+
+            //Checking if the stock is already in the portfolio
+            if (userPortfolio.Any(s => s.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Cannot add the same stock twice");
+
+            Portfolio portfolio = new Portfolio
+            {
+                StockId = stock.Id,
+                AppUserId = appUser.Id
+            };
+
+            //Saving the new portfolio inside the DB
+            await _portfolioRepository.CreateAsync(portfolio);
+
+            if (portfolio == null) return StatusCode(500, "Could not save the change");
+
+            return Created();
+        }
     }
 }

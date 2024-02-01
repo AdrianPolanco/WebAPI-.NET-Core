@@ -61,7 +61,10 @@ namespace WebApi.Repository
 
             return stock;
         }
-
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _context.Stock.FirstOrDefaultAsync(s => s.Symbol == symbol);
+        }
         public async Task<Stock> CreateAsync(Stock stockModel)
         {
             await _context.Stock.AddAsync(stockModel);
@@ -103,5 +106,7 @@ namespace WebApi.Repository
         {
             return _context.Stock.AnyAsync(s => s.Id == id);
         }
+
+
     }
 }

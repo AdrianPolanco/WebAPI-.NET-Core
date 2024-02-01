@@ -34,5 +34,12 @@ namespace WebApi.Repository
                             MarketCap = portfolio.Stock.MarketCap
                         }).ToListAsync();
         }
+        public async Task<Portfolio> CreateAsync(Portfolio portfolio)
+        {
+            await _context.Portfolios.AddAsync(portfolio);
+            await _context.SaveChangesAsync();
+            return portfolio;
+        }
+
     }
 }
