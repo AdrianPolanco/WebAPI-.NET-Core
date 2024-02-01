@@ -25,12 +25,27 @@ namespace WebApi.Data
         //Tables
         public DbSet<Stock> Stock { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Portfolio> Portfolios { get; set; }
 
         //Las entidades de entidad de IdentityDbContext (IdentityRole,IdentityUser, etc.) se configuran sobrescribiendo OnModelCreating
         protected override void OnModelCreating(ModelBuilder builder)
         {
             //Heredando la configuracion del modelo base usando base.OnModelCreating(builder)
             base.OnModelCreating(builder);
+
+            //Configurando una llave primaria compuesta en la tabla intermedia de Portfolios para representar una relación N:N
+            builder.Entity<Portfolio>(x => x.HasKey(p => new { p.AppUserId, p.StockId }));
+
+            builder.Entity<Portfolio>()
+                .HasOne(u => u.AppUser)
+                .WithMany(u => u.Portfolios)
+                .HasForeignKey(p => p.AppUserId);
+
+            builder.Entity<Portfolio>()
+                .HasOne(u => u.Stock)   //La entidad Portfolio tiene una propiedad llamada Stock, referencia a un registro de Stock
+                .WithMany(u => u.Portfolios) //La entidad Stock tiene una propiedad Portfolios, con referencias a registros de Portfolio
+                .HasForeignKey(p => p.StockId); //La llave foranea con referencia al stock es StockId
+
             //Añadiendo la funcionalidad adicional
             //Definiendo los roles que tendre en mi aplicacion
             List<IdentityRole> roles = new List<IdentityRole> {

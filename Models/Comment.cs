@@ -1,6 +1,9 @@
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebApi.Models
 {
+    [Table("Comments")]
     public class Comment
     {
         public int Id { get; set; }
@@ -8,6 +11,7 @@ namespace WebApi.Models
         public string Content { get; set; } = String.Empty;
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public int? StockId { get; set; }
+        //1:1 Relationship
         public Stock? Stock { get; set; }
     }
 }
