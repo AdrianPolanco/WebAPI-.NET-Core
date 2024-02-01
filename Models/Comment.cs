@@ -13,5 +13,7 @@ namespace WebApi.Models
         public int? StockId { get; set; }
         //1:1 Relationship
         public Stock? Stock { get; set; }
+        public string AppUserId { get; set; }
+        public AppUser AppUser { get; set; }
     }
 }
