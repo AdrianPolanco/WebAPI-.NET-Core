@@ -26,8 +26,8 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var stockList = await _stockRepository.GetAllAsync(query);
-            var stocks = stockList.Select(s => s.ToStockDto());
+            List<Stock>? stockList = await _stockRepository.GetAllAsync(query);
+            List<StockDto?> stocks = stockList.Select(s => s.ToStockDto()).ToList();
             return Ok(stocks);
         }
 

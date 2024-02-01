@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOS.Comments;
+using WebApi.Extensions;
 using WebApi.Interfaces;
 using WebApi.Mappers;
 using WebApi.Models;
@@ -12,10 +14,12 @@ namespace WebApi.Controllers
     {
         private readonly ICommentRepository _commentRepo;
         private readonly IStockRepository _stockRepo;
-        public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository)
+        private readonly UserManager<AppUser> _userManager;
+        public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager)
         {
             _commentRepo = commentRepository;
             _stockRepo = stockRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -48,7 +52,11 @@ namespace WebApi.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (!await _stockRepo.Exists(id)) return BadRequest("The stock does not exist");
 
+            string? username = User.GetUsername();
+            AppUser? appUser = await _userManager.FindByNameAsync(username);
+
             Comment _comment = comment.ToCommentFromCreate(id);
+            _comment.AppUserId = appUser.Id;
             await _commentRepo.CreateAsync(_comment);
 
             return CreatedAtAction(nameof(GetById), new { id = _comment.Id }, _comment.ToCommentDto());

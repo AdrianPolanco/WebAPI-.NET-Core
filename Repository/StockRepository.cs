@@ -25,7 +25,10 @@ namespace WebApi.Repository
         {
 
             //Al usar .AsQueryable "diferimos" la ejecucion de la consulta, retornando este metodo un IQueryable<Tabla>, de modo que, hasta que, entre el uso de .AsQueryable() y .ToListAsync() podemos entonces, construir como sera nuestra consulta, en este caso, la estamos "configurando" para que en caso de que el usuario use los query parameters de la ruta para filtrar, entonces se ejecuten los filtrados
-            var stockList = _context.Stock.Include(c => c.Comments).AsQueryable();
+
+            //Include sirve para que nuestro Stock cargue tambien los datos de los Comments que tienen relacion con él
+            //ThenInclude sirve para que, entonces los datos que estan dentro de los Comments relacionados a nuestro Stock tambien se carguen, a esto se le conoce como "Carga ansiosa" ya que carga todos los datos necesarios, para que no haya necesidad de hacer varias consultas a la base de datos
+            var stockList = _context.Stock.Include(c => c.Comments).ThenInclude(c => c.AppUser).AsQueryable();
 
             //Si el query parameter (capturado en las propiedad CompanyName de la clase QueryObject) no es nulo o espacio en blanco entonces se ejecutara el codigo dentro del if
             if (!string.IsNullOrWhiteSpace(query.CompanyName))
