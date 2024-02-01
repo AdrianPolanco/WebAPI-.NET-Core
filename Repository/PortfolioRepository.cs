@@ -41,5 +41,17 @@ namespace WebApi.Repository
             return portfolio;
         }
 
+        public async Task<Portfolio> DeletePortfolio(AppUser user, string symbol)
+        {
+            //Filtering in order to get the register that contains the same id as our user id and the same Stock Symbol as our Symbol that we passed through parameters
+            Portfolio? portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(x => x.AppUserId == user.Id && x.Stock.Symbol.ToLower() == symbol.ToLower());
+
+            if (portfolioModel == null) return null;
+
+            _context.Portfolios.Remove(portfolioModel);
+            await _context.SaveChangesAsync();
+
+            return portfolioModel;
+        }
     }
 }
