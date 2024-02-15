@@ -15,11 +15,13 @@ namespace WebApi.Controllers
         private readonly ICommentRepository _commentRepo;
         private readonly IStockRepository _stockRepo;
         private readonly UserManager<AppUser> _userManager;
-        public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager)
+        private readonly IFMPService _fmpService;
+        public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager, IFMPService fmpService)
         {
             _commentRepo = commentRepository;
             _stockRepo = stockRepository;
             _userManager = userManager;
+            _fmpService = fmpService;
         }
 
         [HttpGet]
@@ -46,16 +48,26 @@ namespace WebApi.Controllers
             return Ok(comment.ToCommentDto());
         }
 
-        [HttpPost("{id:int}")]
-        public async Task<IActionResult> Create([FromRoute] int id, CreateCommentDto comment)
+        [HttpPost("{symbol:alpha}")]
+        public async Task<IActionResult> Create([FromRoute] string symbol, CreateCommentDto comment)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (!await _stockRepo.Exists(id)) return BadRequest("The stock does not exist");
+
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
+
+            if (stock == null)
+            {
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+
+                if (stock == null) return BadRequest("The stock does not exists");
+
+                await _stockRepo.CreateAsync(stock);
+            }
 
             string? username = User.GetUsername();
             AppUser? appUser = await _userManager.FindByNameAsync(username);
 
-            Comment _comment = comment.ToCommentFromCreate(id);
+            Comment _comment = comment.ToCommentFromCreate(stock.Id);
             _comment.AppUserId = appUser.Id;
             await _commentRepo.CreateAsync(_comment);
 

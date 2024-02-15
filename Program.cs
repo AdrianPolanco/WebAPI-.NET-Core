@@ -136,6 +136,9 @@ builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IFMPService, FMPService>();
+//Injecting a HttpClient to the FMPService, since it depends on HttpClient
+builder.Services.AddHttpClient<IFMPService, FMPService>();
 
 var app = builder.Build();
 
