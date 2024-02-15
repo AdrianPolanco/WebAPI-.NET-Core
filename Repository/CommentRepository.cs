@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.Helpers;
 using WebApi.Interfaces;
 using WebApi.Models;
 
@@ -13,9 +14,15 @@ namespace WebApi.Repository
             _context = context;
         }
 
-        public async Task<List<Comment>> GetAllAsync()
+        public async Task<List<Comment>> GetAllAsync(CommentQueryObject commentQueryObject)
         {
-            return await _context.Comments.Include(c => c.AppUser).ToListAsync();
+            IQueryable<Comment>? comments = _context.Comments.Include(c => c.AppUser).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(commentQueryObject.Symbol)) comments = comments.Where(s => s.Stock.Symbol == commentQueryObject.Symbol);
+
+            if (commentQueryObject.IsDescending) comments.OrderByDescending(c => c.CreatedOn);
+
+            return await comments.ToListAsync();
         }
 
         public async Task<Comment?> GetByIdAsync(int id)

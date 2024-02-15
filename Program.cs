@@ -142,6 +142,8 @@ builder.Services.AddHttpClient<IFMPService, FMPService>();
 
 var app = builder.Build();
 
+//After use the builder.Builder() method, everything afterwards are middleware, so the order is pivotal, it is pretty important
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -150,6 +152,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Setting up our CORS
+app.UseCors(a => a
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+        //.WithOrigins("https://localhost:5121") //Change the domain when deploy
+        .SetIsOriginAllowed(origin => true)
+);
+
 app.UseAuthentication();
 app.UseAuthorization();
 //Mapping the controllers so the Https Redirection error dont show up

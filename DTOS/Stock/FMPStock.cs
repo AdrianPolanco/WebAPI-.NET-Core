@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace WebApi.DTOS.Stock
 {
+    //Class made based on the JSON values using json2csharp tool: https://json2csharp.com/
     public class FMPStock
     {
         public string symbol { get; set; }

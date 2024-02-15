@@ -28,10 +28,14 @@ namespace WebApi.Services
 
                 if (result.IsSuccessStatusCode)
                 {
+                    //Serializing the HTTP call as string
                     string content = await result.Content.ReadAsStringAsync();
+                    //Turning the string json to FMPStock instance
                     FMPStock[]? tasks = JsonConvert.DeserializeObject<FMPStock[]>(content);
+                    //Getting into the content, since the response is in an array item
                     FMPStock stock = tasks[0];
 
+                    //If the response has content, we return it converted to Stock
                     if (stock != null) return stock.ToStockFromFMP();
                 }
 

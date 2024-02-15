@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOS.Comments;
 using WebApi.Extensions;
+using WebApi.Helpers;
 using WebApi.Interfaces;
 using WebApi.Mappers;
 using WebApi.Models;
@@ -25,12 +27,13 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] CommentQueryObject commentQueryObject)
         {
             //Performing the validations written in the data annotations of our DTOs
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            List<Comment> comments = await _commentRepo.GetAllAsync();
+            List<Comment> comments = await _commentRepo.GetAllAsync(commentQueryObject);
             var commentDtos = comments.Select(c => c.ToCommentDto());
 
             return Ok(commentDtos);

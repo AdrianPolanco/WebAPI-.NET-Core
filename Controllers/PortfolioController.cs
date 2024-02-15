@@ -49,12 +49,16 @@ namespace WebApi.Controllers
             //Getting stock by its symbol
             Stock? stock = await _stockRepository.GetBySymbolAsync(symbol);
 
+            //Checking if the stock is not in our database
             if (stock == null)
             {
+                //Making a HTTP call to the Financial Modeling Prep API
                 stock = await _fmpService.FindStockBySymbolAsync(symbol);
 
+                //Checking the stock code also doesnt exists in the API and returning a 400 status code
                 if (stock == null) return BadRequest("The stock does not exists");
 
+                //If the code exists in the API we will store it in our database
                 await _stockRepository.CreateAsync(stock);
             }
 
